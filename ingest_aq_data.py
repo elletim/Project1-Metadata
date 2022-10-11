@@ -1,4 +1,4 @@
-from msilib.schema import Binary
+
 import psycopg2
 
 connection = psycopg2.connect("dbname=aq user=postgres")
