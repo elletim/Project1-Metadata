@@ -24,12 +24,9 @@ for url in urls:
     lat = get_value(6)
     long = get_value(7)
     timezone= get_value(8)
-    city_id=  city + region
+    city_id=  region+city
     print(city_id)
     
-
-
-
 connection = psycopg2.connect("dbname=aq user=postgres")
 cursor = connection.cursor()
 #cursor.execute(" " "
@@ -37,4 +34,4 @@ cursor = connection.cursor()
  #VALUES (%s, %s, %s, %s, %s, %s, %s); ())
 cursor.execute("SELECT * FROM aq_data;")
 records = cursor.fetchall()
-print(records)
+#print(records)
