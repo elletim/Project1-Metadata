@@ -12,7 +12,7 @@ def get_values(url):
         df = pd.DataFrame(data=page_df)
         df["Date"] = pd.to_datetime(df[["Year","Month","Day"]])
         pm2_5 = df["PM2.5"].to_list()
-        datetime = df["Date"]
+        datetime = df["Date"].val
         return(datetime)
 def get_city(url):
         page = req.get(url) 
@@ -28,14 +28,15 @@ urls = ["http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Cali
        "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/New_York/New_York.txt",
        "http://berkeleyearth.lbl.gov/air-quality/maps/cities/India/NCT/New_Delhi.txt"]
 for url in urls:
-        #print(get_city(url))
-        print(get_values(url))
-#connection = psycopg2.connect("dbname=aq user=postgres")
-#cursor = connection.cursor()
-#cursor.execute("DROP table IF EXISTS aq_data")
-#cursor.execute("CREATE TABLE aq_data (city_id int REFERENCES aq_meta (city_id), datetime timestamp, pm2_5 float);")
-#select city_id from aq_meta where city = city 
-#cursor.execute('''INSERT INTO aq_meta (city_id, country, datetime, pm2_5) VALUES (%s, %s, %s)''', (city_id, dateime, pm2_5))
+        city_data = get_city(url)
+       # print(get_values(url))
+        connection = psycopg2.connect("dbname=aq user=postgres")
+        cursor = connection.cursor()
+        cursor.execute("DROP table IF EXISTS aq_data")
+        city_id = cursor.execute('''SELECT city_id FROM aq_meta WHERE city =%s''' %city_data)
+        print(city_id)
+        cursor.execute("CREATE TABLE aq_data (city_id int REFERENCES aq_meta (city_id), datetime timestamp, pm2_5 float);")
+        #cursor.execute('''INSERT INTO aq_meta (city_id, country, datetime, pm2_5) VALUES (%s, %s, %s)''', (city_id, dateime, pm2_5))
 #cursor.execute("SELECT * FROM aq_meta;")
 #records = cursor.fetchall()
 #print(records)
