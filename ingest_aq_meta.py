@@ -39,12 +39,10 @@ if __name__ == "__main__":
     cursor.execute("DROP table IF EXISTS aq_meta")
     cursor.execute("CREATE TABLE aq_meta (city varchar(50), country varchar(50), region varchar(50), lat float, long float, time_zone varchar(50), city_id int, PRIMARY KEY(city_id));")
     for city,country,region, lat, long, timezone, city_id in meta:
-
         cursor.execute('''INSERT INTO aq_meta (city, country, region, lat, long, time_zone, city_id) VALUES (%s, %s, %s, %s, %s, %s, %s)''', (city, country, region, lat, long, timezone, city_id))
         cursor.execute("SELECT * FROM aq_meta;")
         records = cursor.fetchall()
         print(records)
         connection.commit()
-    
     cursor.close()
     connection.close()
