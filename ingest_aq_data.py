@@ -45,27 +45,24 @@ if __name__ == "__main__":
     cursor = connection.cursor()
     cursor.execute("DROP table IF EXISTS aq_data")
     cursor.execute("CREATE TABLE aq_data (city_id int REFERENCES aq_meta (city_id), datetime timestamp, pm2_5 float);")
-    #cursor.execute("CREATE TABLE aq_data (datetime timestamp[], pm2_5 float[]);")
     for url in urls:
         datetime = get_datetime(url)
         pm2_5 = get_pm25(url)
         city_data = get_city(url)
-        #for d, p in (datetime, pm2_5):
-                #datetime = d
-                #print(datetime)
-                #cursor.execute('''INSERT INTO aq_data (datetime) VALUES (%s)''', [d])
-        for p in pm2_5:
-                print(p)
-                #cursor.execute('''INSERT INTO aq_data (pm2_5) VALUES (%s)''', [p])
-
-        #city_id = cursor.execute('''SELECT city_id FROM aq_meta WHERE city = %s''' %city_data)
         city_id = cursor.execute('''SELECT city_id FROM aq_meta WHERE city ='city_data,' ''')
+        for d, p in zip(datetime, pm2_5):
+                cursor.execute('''INSERT INTO aq_data (city_id, datetime, pm2_5) VALUES (%s, %s, %s)''', (city_id, d,p))
+
+        #cursor.execute('''SELECT city_id FROM aq_meta WHERE city = {}'''.format(city_data))
         #cursor.execute('''SELECT city FROM aq_meta ''')
-        #cursor.execute('''INSERT INTO aq_data (city_id) VALUE (%s)''', (city_id))
-        #cursor.execute('''INSERT INTO aq_data (city_id, datetime, pm2_5) VALUES (%s, %s, %s)''', (city_id, datetime, pm2_5))
+        
         #cursor.execute("SELECT * FROM aq_data;")
         #records = cursor.fetchall()
         #print(records)
+        connection.commit()
+    cursor.close()
+    connection.close()
+    
 
      
         
