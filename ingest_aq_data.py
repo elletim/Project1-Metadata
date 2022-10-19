@@ -16,6 +16,7 @@ def get_datetime(url):
         return(datetime)
        # data.append([pm2_5, datetime])
        # return(data)
+
 def get_pm25(url):
         page = req.get(url) 
         page_df= pd.read_csv(StringIO(page.text),skiprows=10,sep='\t')
@@ -39,25 +40,31 @@ if __name__ == "__main__":
         "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/California/San_Diego.txt",
        "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/New_York/New_York_City.txt",
        "http://berkeleyearth.lbl.gov/air-quality/maps/cities/India/NCT/New_Delhi.txt"]
+    
+    connection = psycopg2.connect("dbname=aq user=postgres")
+    cursor = connection.cursor()
+    cursor.execute("DROP table IF EXISTS aq_data")
+    cursor.execute("CREATE TABLE aq_data (city_id int REFERENCES aq_meta (city_id), datetime timestamp[], pm2_5 float[]);")
+    #cursor.execute("CREATE TABLE aq_data (datetime timestamp[], pm2_5 float[]);")
     for url in urls:
         datetime = get_datetime(url)
         pm2_5 = get_pm25(url)
-        print(type(pm2_5))
         city_data = get_city(url)
-        connection = psycopg2.connect("dbname=aq user=postgres")
-        cursor = connection.cursor()
-        cursor.execute("DROP table IF EXISTS aq_data")
         #city_id = cursor.execute('''SELECT city_id FROM aq_meta WHERE city = %s''' %city_data)
-        city_id = cursor.execute('''SELECT city_id FROM aq_meta WHERE city ='city_data' ''')
-        cursor.execute("CREATE TABLE aq_data (city_id int REFERENCES aq_meta (city_id), datetime timestamp[], pm2_5 float[]);")
+        city_id = cursor.execute('''SELECT city_id FROM aq_meta WHERE city ='city_data,' ''')
+        #cursor.execute('''SELECT city FROM aq_meta ''')
+        #cursor.execute('''INSERT INTO aq_data (city_id) VALUE (%s)''', (city_id))
         cursor.execute('''INSERT INTO aq_data (city_id, datetime, pm2_5) VALUES (%s, %s, %s)''', (city_id, datetime, pm2_5))
-        #cursor.execute('''SELECT city_id, UNNEST(ARRAY(datetime, ',')) AS datetime FROM aq_data''')
+        #cursor.execute('''INSERT INTO aq_data (datetime, pm2_5) SELECT UNNEST (array [%s], array [%s])'''), datetime, pm2_5 
         cursor.execute("SELECT * FROM aq_data;")
         records = cursor.fetchall()
+        print(records)
+
+     
         
     
-        cursor.close()
-        connection.close()
+      #cursor.close()
+      #connection.close()
 
 
 
