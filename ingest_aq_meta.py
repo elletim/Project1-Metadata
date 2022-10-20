@@ -36,6 +36,7 @@ if __name__ == "__main__":
     
     connection = psycopg2.connect("dbname=aq user=postgres")
     cursor = connection.cursor()
+    cursor.execute("DROP table IF EXISTS aq_data")
     cursor.execute("DROP table IF EXISTS aq_meta")
     cursor.execute("CREATE TABLE aq_meta (city varchar(50), country varchar(50), region varchar(50), lat float, long float, time_zone varchar(50), city_id int, PRIMARY KEY(city_id));")
     for city,country,region, lat, long, timezone, city_id in meta:
