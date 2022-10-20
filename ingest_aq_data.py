@@ -14,8 +14,6 @@ def get_datetime(url):
         df["Date"] = pd.to_datetime(df[["Year","Month","Day"]])
         datetime = df["Date"].to_list()
         return(datetime)
-       # data.append([pm2_5, datetime])
-       # return(data)
 
 def get_pm25(url):
         page = req.get(url) 
@@ -26,14 +24,20 @@ def get_pm25(url):
         pm2_5 = df["PM2.5"].to_list()
         return(pm2_5)
 
-
 def get_city(url):
         page = req.get(url) 
         page_data = page.text
         page_line = page_data.split('\n')
         line= page_line[1]
         city = line.split(":",1)[1]
+        city = str.strip(city)
         return(city)
+
+def get_cityid(city_data):
+        cursor.execute('''SELECT city_id FROM aq_meta WHERE city = (%s)''', (city_data,))
+        records = cursor.fetchall()
+        return(records)
+
 
 if __name__ == "__main__":
     urls = ["http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/California/Los_Angeles.txt", 
@@ -49,16 +53,14 @@ if __name__ == "__main__":
         datetime = get_datetime(url)
         pm2_5 = get_pm25(url)
         city_data = get_city(url)
-        city_id = cursor.execute('''SELECT city_id FROM aq_meta WHERE city ='city_data,' ''')
+        city_id = get_cityid(city_data)
+        city_id = city_id[0]
+        city_id = int(str(city_id).replace('(', '').replace(')','').replace(',',''))
         for d, p in zip(datetime, pm2_5):
                 cursor.execute('''INSERT INTO aq_data (city_id, datetime, pm2_5) VALUES (%s, %s, %s)''', (city_id, d,p))
-
-        #cursor.execute('''SELECT city_id FROM aq_meta WHERE city = {}'''.format(city_data))
-        #cursor.execute('''SELECT city FROM aq_meta ''')
-        
-        #cursor.execute("SELECT * FROM aq_data;")
-        #records = cursor.fetchall()
-        #print(records)
+        cursor.execute("SELECT * FROM aq_data;")
+        records = cursor.fetchall()
+        print(records)
         connection.commit()
     cursor.close()
     connection.close()
@@ -67,8 +69,5 @@ if __name__ == "__main__":
      
         
     
-      #cursor.close()
-      #connection.close()
-
 
 
