@@ -9,9 +9,12 @@ def get_datetime(url):
         page = req.get(url) 
         page_df= pd.read_csv(StringIO(page.text),skiprows=10,sep='\t')
         page_df.columns= ['Year','Month','Day', 'UTC Hour','PM2.5','PM10_mask','Retrospective']     
-        page_df = page_df[["Year","Month","Day","PM2.5",]]
+        page_df = page_df[["Year","Month","Day","UTC Hour"]]
         df = pd.DataFrame(data=page_df)
-        df["Date"] = pd.to_datetime(df[["Year","Month","Day"]])
+        cols = df.columns
+        d = {"UTC Hour":"hour", "Year":"year", "Month":"month", "Day":"day"}
+        print(df['UTC Hour'])
+        df["Date"] = pd.to_datetime(df[cols].rename(columns=d))
         datetime = df["Date"].to_list()
         return(datetime)
 
@@ -43,8 +46,18 @@ if __name__ == "__main__":
     urls = ["http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/California/Los_Angeles.txt", 
         "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/California/San_Diego.txt",
        "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/New_York/New_York_City.txt",
-       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/India/NCT/New_Delhi.txt"]
-    
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/India/NCT/New_Delhi.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/California/San_Francisco.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Colorado/Denver.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Georgia/Atlanta.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Texas/Houston.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Arizona/Phoenix.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Maryland/Baltimore.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/India/Maharashtra/Mumbai.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_Arab_Emirates/Dubai/Dubai.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/Bangladesh/Dhaka/Dhaka.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/China/Guangdong/Guangzhou.txt"]
+       
     connection = psycopg2.connect("dbname=aq user=postgres")
     cursor = connection.cursor()
     cursor.execute("DROP table IF EXISTS aq_data")
@@ -56,11 +69,14 @@ if __name__ == "__main__":
         city_id = get_cityid(city_data)
         city_id = city_id[0]
         city_id = int(str(city_id).replace('(', '').replace(')','').replace(',',''))
+        #cursor.execute('''SELECT max(datetime) FROM aq_meta WHERE city_id = (%s)''', (city_id,))
+        #last_date = datetime[len(datetime)-1]
+        #if city_id = 
         for d, p in zip(datetime, pm2_5):
                 cursor.execute('''INSERT INTO aq_data (city_id, datetime, pm2_5) VALUES (%s, %s, %s)''', (city_id, d,p))
         cursor.execute("SELECT * FROM aq_data;")
         records = cursor.fetchall()
-        print(records)
+        #print(records)
         connection.commit()
     cursor.close()
     connection.close()

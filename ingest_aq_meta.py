@@ -30,7 +30,22 @@ if __name__ == "__main__":
     urls = ["http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/California/Los_Angeles.txt", 
         "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/California/San_Diego.txt",
        "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/New_York/New_York_City.txt",
-       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/India/NCT/New_Delhi.txt"]
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/India/NCT/New_Delhi.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/California/San_Francisco.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Colorado/Denver.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Georgia/Atlanta.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Texas/Houston.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Arizona/Phoenix.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_States/Maryland/Baltimore.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/India/Maharashtra/Mumbai.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/United_Arab_Emirates/Dubai/Dubai.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/Bangladesh/Dhaka/Dhaka.txt",
+       "http://berkeleyearth.lbl.gov/air-quality/maps/cities/China/Guangdong/Guangzhou.txt"]
+       
+
+
+
+       
 
     meta = get_meta(urls)
     
@@ -43,7 +58,7 @@ if __name__ == "__main__":
         cursor.execute('''INSERT INTO aq_meta (city, country, region, lat, long, time_zone, city_id) VALUES (%s, %s, %s, %s, %s, %s, %s)''', (city, country, region, lat, long, timezone, city_id))
         cursor.execute("SELECT * FROM aq_meta;")
         records = cursor.fetchall()
-        print(records)
+        #print(records)
         connection.commit()
     cursor.close()
     connection.close()
